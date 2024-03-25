@@ -38,6 +38,7 @@ class MainMenuState:
         btn_frame,
         game_state_manager,
         logo,
+        background_image,
     ):
         self.screen_width = screen_width
         self.screen_height = screen_height
@@ -46,6 +47,7 @@ class MainMenuState:
         self.btn_frame = btn_frame
         self.game_state_manager = game_state_manager
         self.logo = logo
+        self.background_image = background_image
 
         self.buttons = [
             Button(
@@ -116,7 +118,8 @@ class MainMenuState:
             button.update(pygame.mouse.get_pos())
 
     def draw(self, surface):
-        surface.fill((255, 255, 255))
+        self.background_image.draw(surface)
+
         self.logo.draw(surface)
         for button in self.buttons:
             button.draw(surface)
@@ -142,6 +145,7 @@ class SettingsState:
         btn_frame,
         game_state_manager,
         logo,
+        background_image,
     ):
         self.screen_width = screen_width
         self.screen_height = screen_height
@@ -151,6 +155,7 @@ class SettingsState:
         self.game_state_manager = game_state_manager
         self.logo = logo
         self.music_status = True
+        self.background_image = background_image
 
         self.buttons = [
             Button(
@@ -196,7 +201,7 @@ class SettingsState:
             button.update(pygame.mouse.get_pos())
 
     def draw(self, surface):
-        surface.fill((255, 255, 255))
+        self.background_image.draw(surface)
         self.logo.draw(surface)
         for button in self.buttons:
             button.draw(surface)
@@ -219,6 +224,7 @@ class CreditsState:
         btn_frame,
         game_state_manager,
         logo,
+        background_image,
     ):
         self.screen_width = screen_width
         self.screen_height = screen_height
@@ -227,6 +233,7 @@ class CreditsState:
         self.btn_frame = btn_frame
         self.game_state_manager = game_state_manager
         self.logo = logo
+        self.background_image = background_image
 
         self.buttons = [
             Button(
@@ -267,7 +274,7 @@ class CreditsState:
             button.update(pygame.mouse.get_pos())
 
     def draw(self, surface):
-        surface.fill((255, 255, 255))
+        self.background_image.draw(surface)
         self.logo.draw(surface)
         y_offset = 200
         for text in self.credit_texts:
@@ -284,6 +291,106 @@ class CreditsState:
         self.game_state_manager.change_state("MainMenu")
 
 
+class LevelState:
+    def __init__(
+        self,
+        screen_width,
+        screen_height,
+        font,
+        click_sound,
+        btn_frame,
+        game_state_manager,
+        logo,
+        background_image,
+    ):
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+        self.font = font
+        self.click_sound = click_sound
+        self.btn_frame = btn_frame
+        self.game_state_manager = game_state_manager
+        self.logo = logo
+        self.background_image = background_image
+
+        button_width = 250
+        button_height = 50
+        button_spacing = 40
+        button_x = (self.screen_width - button_width) / 4
+        button_y = (self.screen_height - button_height) - 400
+
+        self.buttons = [
+            Button(
+                button_x,
+                button_y,
+                button_width,
+                button_height,
+                "Endless Mode",
+                self.font,
+                (31, 122, 136),
+                (81, 122, 136),
+                action=self.endless_mode_clicked,
+                sound_click=self.click_sound,
+                frame_image=self.btn_frame,
+            ),
+            Button(
+                button_x + button_width + button_spacing,
+                button_y,
+                button_width,
+                button_height,
+                "First Stage",
+                self.font,
+                (31, 122, 136),
+                (81, 122, 136),
+                action=self.first_stage_clicked,
+                sound_click=self.click_sound,
+                frame_image=self.btn_frame,
+            ),
+            Button(
+                (self.screen_width - button_width) / 2,
+                self.screen_height - button_height - 40,
+                button_width,
+                button_height,
+                "Back",
+                self.font,
+                (31, 122, 136),
+                (81, 122, 136),
+                action=self.back_button_clicked,
+                sound_click=self.click_sound,
+                frame_image=self.btn_frame,
+            ),
+        ]
+
+    def handle_events(self, event):
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            exit()
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            for button in self.buttons:
+                if button.rect.collidepoint(event.pos):
+                    button.click()
+
+    def update(self):
+        for button in self.buttons:
+            button.update(pygame.mouse.get_pos())
+
+    def draw(self, surface):
+        self.background_image.draw(surface)
+        self.logo.draw(surface)
+        for button in self.buttons:
+            button.draw(surface)
+
+    def endless_mode_clicked(self):
+        # Navigate to Endless Mode
+        pass
+
+    def first_stage_clicked(self):
+        # Navigate to First Stage
+        pass
+
+    def back_button_clicked(self):
+        self.game_state_manager.change_state("MainMenu")
+
+
 def main():
     pygame.init()
     WIDTH = 1200
@@ -295,6 +402,7 @@ def main():
     Click_sound = "GameFiles/assets/sounds/click_sound.mp3"
     btn_frame = "GameFiles/assets/images/btn_frame.png"
     LOGO = "GameFiles/assets/images/Logo.png"
+    MBG = "GameFiles/assets/images/background_image.png"
     LOGO_WIDTH = WIDTH - (WIDTH // 4)
     logo_x = (WIDTH - LOGO_WIDTH) // 2
     logo_y = 30
@@ -302,20 +410,32 @@ def main():
     game_state_manager = GameStateManager()
     logo = Image(LOGO, logo_x, logo_y)
     logo.resize(LOGO_WIDTH, 200)
+    mainBg = Image(MBG, 0, 0)
 
     main_menu_state = MainMenuState(
-        WIDTH, HEIGHT, FONT, Click_sound, btn_frame, game_state_manager, logo
+        WIDTH, HEIGHT, FONT, Click_sound, btn_frame, game_state_manager, logo, mainBg
     )
     settings_state = SettingsState(
-        WIDTH, HEIGHT, FONT, Click_sound, btn_frame, game_state_manager, logo
+        WIDTH, HEIGHT, FONT, Click_sound, btn_frame, game_state_manager, logo, mainBg
     )
     credits_state = CreditsState(
-        WIDTH, HEIGHT, FONT, Click_sound, btn_frame, game_state_manager, logo
+        WIDTH, HEIGHT, FONT, Click_sound, btn_frame, game_state_manager, logo, mainBg
+    )
+    level_state = LevelState(
+        WIDTH,
+        HEIGHT,
+        FONT,
+        Click_sound,
+        btn_frame,
+        game_state_manager,
+        logo,
+        mainBg,
     )
 
     game_state_manager.add_state("MainMenu", main_menu_state)
     game_state_manager.add_state("Settings", settings_state)
     game_state_manager.add_state("Credits", credits_state)
+    game_state_manager.add_state("Levels", level_state)
     game_state_manager.change_state("MainMenu")
 
     clock = pygame.time.Clock()
