@@ -15,6 +15,7 @@ class Button:
         action=None,
         sound_click=None,
         frame_image=None,
+        id=None,
     ):
         self.x = x
         self.y = y
@@ -26,6 +27,7 @@ class Button:
         self.hover_color = hover_color
         self.action = action
         self.sound_click = sound_click
+        self.id = id
         self.frame_image = (
             pygame.transform.scale(
                 pygame.image.load(frame_image).convert_alpha(),
