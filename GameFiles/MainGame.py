@@ -1,6 +1,8 @@
 import pygame
+import random
 from Tools.Button import Button
 from Tools.Image import Image
+from Tools.Projectiles import Projectile
 
 
 class GameStateManager:
@@ -257,7 +259,7 @@ class CreditsState:
             "Upklyat(Buttons Frames, Dialogue Background)",
             "universfield(Buttons Click Sound)",
             "nojisuma(BackGround Music)",
-            "limitype(Font)",
+            "limitype, Hello Baby(Font)",
         ]
 
     def handle_events(self, event):
@@ -380,7 +382,7 @@ class LevelState:
             button.draw(surface)
 
     def endless_mode_clicked(self):
-        # Navigate to Endless Mode
+        self.game_state_manager.change_state("Endless")
         pass
 
     def first_stage_clicked(self):
@@ -391,6 +393,99 @@ class LevelState:
         self.game_state_manager.change_state("MainMenu")
 
 
+class EndlessModState:
+    def __init__(self, screen_width, screen_height, font, gsm):
+        self.screen_width = screen_width
+        self.game_state_manager = gsm
+        self.screen_height = screen_height
+        self.font = font
+        self.hearts = 300
+        self.player_x = screen_width / 2
+        self.player_y = screen_height / 2
+        self.player_size = 50
+        self.player = pygame.Rect(
+            self.player_x, self.player_y, self.player_size, self.player_size
+        )
+        self.enemy_size = 50
+        self.enemy_speed = 2
+        self.enemy_color = (255, 0, 0)
+        self.enemies = []
+        self.score = 0
+        self.spawn_timer = 0
+        self.spawn_interval = 200
+        self.projectiles_per_spawn = 3
+
+    def spawn_enemy(self):
+        for _ in range(self.projectiles_per_spawn):
+            enemy_x = random.randint(10, self.screen_width - 10)
+            enemy_y = random.randint(10, self.screen_height - 10)
+            enemy = Projectile(
+                enemy_x,
+                enemy_y,
+                self.player_x,
+                self.player_y,
+                self.enemy_speed,
+                self.enemy_size,
+                self.enemy_color,
+                None,
+            )
+            self.enemies.append(enemy)
+
+    def mouse_hit_enemy(self):
+        self.score += 1
+
+    def on_player_hit(self):
+        self.hearts -= 1
+        if self.hearts <= 0:
+            self.game_state_manager.change_state("MainMenu")
+            self.hearts = 3
+            self.score = 0
+
+    def update(self):
+
+        self.spawn_timer += 1
+
+        if self.spawn_timer >= self.spawn_interval:
+            self.spawn_enemy()
+            self.spawn_timer = 0
+
+        for enemy in self.enemies:
+            if self.player.collidepoint((enemy.x, enemy.y)):
+                self.enemies.remove(enemy)
+                self.on_player_hit()
+            elif enemy.rect.collidepoint((self.mousepos)):
+                self.enemies.remove(enemy)
+                self.score += 1
+
+            enemy.update()
+
+    def draw(self, surface):
+        score_text = self.font.render(f"Score: {self.score}", True, (255, 255, 255))
+        surface.blit(score_text, (10, 10))
+
+        heart_x = self.screen_width - 30
+        heart_y = 10
+        for i in range(self.hearts):
+            pygame.draw.rect(
+                surface, (255, 0, 0), pygame.Rect(heart_x, heart_y, 20, 20)
+            )
+            heart_x -= 30
+
+        pygame.draw.rect(surface, (0, 255, 0), self.player)
+
+        for enemy in self.enemies:
+            enemy.draw(surface)
+
+    def handle_events(self, event):
+        if event.type == pygame.QUIT:
+            pygame.quit()
+
+
+class FirstStageState:
+    def __init__(self):
+        pass
+
+
 def main():
     pygame.init()
     WIDTH = 1200
@@ -399,6 +494,7 @@ def main():
     pygame.display.set_caption("The Silent Defender")
 
     FONT = pygame.font.Font("GameFiles/assets/fonts/font.otf", 40)
+    FONT2 = pygame.font.Font("GameFiles/assets/fonts/font2.otf", 40)
     Click_sound = "GameFiles/assets/sounds/click_sound.mp3"
     btn_frame = "GameFiles/assets/images/btn_frame.png"
     LOGO = "GameFiles/assets/images/Logo.png"
@@ -431,11 +527,18 @@ def main():
         logo,
         mainBg,
     )
+    endlessmod_state = EndlessModState(
+        WIDTH,
+        HEIGHT,
+        FONT2,
+        game_state_manager,
+    )
 
     game_state_manager.add_state("MainMenu", main_menu_state)
     game_state_manager.add_state("Settings", settings_state)
     game_state_manager.add_state("Credits", credits_state)
     game_state_manager.add_state("Levels", level_state)
+    game_state_manager.add_state("Endless", endlessmod_state)
     game_state_manager.change_state("MainMenu")
 
     clock = pygame.time.Clock()
