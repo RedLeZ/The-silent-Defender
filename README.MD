@@ -17,4 +17,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 - [Upklyak](https://www.freepik.com/author/upklyak): For providing button frames and dialogue background.
 - [Universfield](https://pixabay.com/users/universfield-28281460/): For contributing button click sound.
 - [Nojisuma](https://pixabay.com/users/nojisuma-23737290/): For background music.
-- [Limitype](https://www.1001freefonts.com/designer-limitype-fontlisting.php): For the "Hello Baby" font used in the game.
+- [Limitype](https://www.1001freefonts.com/designer-limitype-fontlisting.php): For the font used in the game.
