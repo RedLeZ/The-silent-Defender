@@ -1,5 +1,7 @@
 import pygame
 
+pygame.init()
+
 
 class Projectile:
     def __init__(
@@ -37,3 +39,14 @@ class Projectile:
             pygame.draw.rect(surface, self.color, self.rect)
         else:
             surface.blit(self.image, self.rect.topleft)
+
+    def collide_with_point(self, point):
+        return self.rect.collidepoint(point)
+
+    def check_for_mouse_hit(self):
+        # check if mouse is clicked on projectiles and return  True or False accordingly
+        pos = pygame.mouse.get_pos()
+        if self.collide_with_point(pos):
+            return True
+        else:
+            return False

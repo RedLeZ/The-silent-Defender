@@ -454,12 +454,9 @@ class EndlessModState:
                 self.enemies.remove(enemy)
                 self.on_player_hit()
                 pass
-            elif pygame.mouse.get_pressed()[0]:
-                pos = pygame.mouse.get_pos()
-                if enemy.colliderect(pygame.Rect(pos[0], pos[1], 1, 1)):
-                    self.enemies.remove(enemy)
-                    self.mouse_hit_enemy
-
+            if enemy.check_for_mouse_hit():
+                self.enemies.remove(enemy)
+                self.mouse_hit_enemy
 
             enemy.update()
 
