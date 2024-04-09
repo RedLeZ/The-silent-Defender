@@ -3,6 +3,7 @@ import random
 from Tools.Button import Button
 from Tools.Image import Image
 from Tools.Projectiles import Projectile
+from Tools.SoundBar import VolumeSlider
 
 
 class GameStateManager:
@@ -143,6 +144,7 @@ class SettingsState:
         screen_width,
         screen_height,
         font,
+        music,
         click_sound,
         btn_frame,
         game_state_manager,
@@ -152,13 +154,15 @@ class SettingsState:
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.font = font
+        self.music = music
         self.click_sound = click_sound
         self.btn_frame = btn_frame
         self.game_state_manager = game_state_manager
         self.logo = logo
         self.music_status = True
         self.background_image = background_image
-
+        self.volume = pygame.mixer.music.get_volume()
+        self.current_volume = self.volume
         self.buttons = [
             Button(
                 (self.screen_width - 150) / 2,
@@ -189,6 +193,20 @@ class SettingsState:
             ),
         ]
 
+        def update_volume(volume):
+            self.current_volume = volume
+
+        self.sound_control = VolumeSlider(
+            (self.screen_width - 400) / 2,
+            self.screen_height / 3 + 26.666666666666668,
+            400,
+            50,
+            (200, 200, 200),
+            (0, 0, 255),
+            update_volume,
+            self.btn_frame,
+        )
+
     def handle_events(self, event):
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -198,13 +216,20 @@ class SettingsState:
                 if button.rect.collidepoint(event.pos):
                     button.click()
 
+        self.sound_control.handle_event(event)
+
     def update(self):
+        pygame.mixer.music.set_volume(self.current_volume)
         for button in self.buttons:
             button.update(pygame.mouse.get_pos())
+
+        self.sound_control.update()
 
     def draw(self, surface):
         self.background_image.draw(surface)
         self.logo.draw(surface)
+        self.sound_control.draw(surface)
+
         for button in self.buttons:
             button.draw(surface)
 
@@ -386,7 +411,7 @@ class LevelState:
         pass
 
     def first_stage_clicked(self):
-        # Navigate to First Stage
+        # Navigate to First Stage (one Day)
         pass
 
     def back_button_clicked(self):
@@ -515,6 +540,9 @@ def main():
     btn_frame = "GameFiles/assets/images/btn_frame.png"
     LOGO = "GameFiles/assets/images/Logo.png"
     MBG = "GameFiles/assets/images/background_image.png"
+    SNG = "GameFiles/assets/sounds/MenuMusic.mp3"
+    pygame.mixer.music.load(SNG)
+    pygame.mixer.music.play(-1)
     LOGO_WIDTH = WIDTH - (WIDTH // 4)
     logo_x = (WIDTH - LOGO_WIDTH) // 2
     logo_y = 30
@@ -528,7 +556,15 @@ def main():
         WIDTH, HEIGHT, FONT, Click_sound, btn_frame, game_state_manager, logo, mainBg
     )
     settings_state = SettingsState(
-        WIDTH, HEIGHT, FONT, Click_sound, btn_frame, game_state_manager, logo, mainBg
+        WIDTH,
+        HEIGHT,
+        FONT,
+        SNG,
+        Click_sound,
+        btn_frame,
+        game_state_manager,
+        logo,
+        mainBg,
     )
     credits_state = CreditsState(
         WIDTH, HEIGHT, FONT, Click_sound, btn_frame, game_state_manager, logo, mainBg
@@ -558,8 +594,7 @@ def main():
     game_state_manager.change_state("MainMenu")
 
     clock = pygame.time.Clock()
-    pygame.mixer.music.load("GameFiles/assets/sounds/MenuMusic.mp3")
-    pygame.mixer.music.play(-1)
+
     running = True
     while running:
         for event in pygame.event.get():
