@@ -403,8 +403,15 @@ class EndlessModState:
         self.player_x = screen_width / 2
         self.player_y = screen_height / 2
         self.player_size = 50
+        self.p_zone_size = 325
+        self.p_zone_x = self.player_x - self.p_zone_size / 2
+        self.p_zone_y = self.player_y - self.p_zone_size / 2
         self.player = pygame.Rect(
             self.player_x, self.player_y, self.player_size, self.player_size
+        )
+
+        self.p_zone = pygame.Rect(
+            self.p_zone_x, self.p_zone_y, self.p_zone_size, self.p_zone_size
         )
         self.enemy_size = 50
         self.enemy_speed = 2
@@ -419,6 +426,13 @@ class EndlessModState:
         for _ in range(self.projectiles_per_spawn):
             enemy_x = random.randint(10, self.screen_width - 10)
             enemy_y = random.randint(10, self.screen_height - 10)
+            while (
+                enemy_x < self.player_x + self.p_zone_size / 2
+                and enemy_x > self.player_x - self.p_zone_size / 2
+                and enemy_y < self.player_y + self.p_zone_size / 2
+            ):
+                enemy_y = random.randint(10, self.screen_height - 10)
+                enemy_x = random.randint(10, self.screen_width - 10)
             enemy = Projectile(
                 enemy_x,
                 enemy_y,
@@ -453,15 +467,11 @@ class EndlessModState:
             if self.player.collidepoint((enemy.x, enemy.y)):
                 self.enemies.remove(enemy)
                 self.on_player_hit()
-                pass
-            if enemy.check_for_mouse_hit():
-                self.enemies.remove(enemy)
-                self.mouse_hit_enemy
 
             enemy.update()
 
     def draw(self, surface):
-        score_text = self.font.render(f"Score: {self.score}", True, (255, 255, 255))
+        score_text = self.font.render(f"Score: {self.score}", True, (0, 0, 0))
         surface.blit(score_text, (10, 10))
 
         heart_x = self.screen_width - 30
@@ -471,7 +481,7 @@ class EndlessModState:
                 surface, (255, 0, 0), pygame.Rect(heart_x, heart_y, 20, 20)
             )
             heart_x -= 30
-
+        pygame.draw.rect(surface, pygame.Color(255, 255, 255, 120), self.p_zone)
         pygame.draw.rect(surface, (0, 255, 0), self.player)
 
         for enemy in self.enemies:
@@ -480,6 +490,11 @@ class EndlessModState:
     def handle_events(self, event):
         if event.type == pygame.QUIT:
             pygame.quit()
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            for enemy in self.enemies:
+                if enemy.check_for_mouse_hit():
+                    self.score += 1
+                    self.enemies.remove(enemy)
 
 
 class FirstStageState:

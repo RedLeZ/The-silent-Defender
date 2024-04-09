@@ -44,7 +44,6 @@ class Projectile:
         return self.rect.collidepoint(point)
 
     def check_for_mouse_hit(self):
-        # check if mouse is clicked on projectiles and return  True or False accordingly
         pos = pygame.mouse.get_pos()
         if self.collide_with_point(pos):
             return True
