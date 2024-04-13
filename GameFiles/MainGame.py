@@ -235,7 +235,10 @@ class SettingsState:
 
     def toggle_music(self):
         self.music_status = not self.music_status
-        pygame.mixer.music.set_volume(1 if self.music_status else 0)
+        if self.music_status:
+            pygame.mixer.music.unpause()
+        else:
+            pygame.mixer.music.pause()
         for button in self.buttons:
             if button.id is not None and button.id == "Music":
                 button.text = f"Music {'On' if self.music_status else 'Off'}"
@@ -424,7 +427,8 @@ class EndlessModState:
         self.game_state_manager = gsm
         self.screen_height = screen_height
         self.font = font
-        self.hearts = 300
+        self.hearts = 3
+        self.wave = 1
         self.player_x = screen_width / 2
         self.player_y = screen_height / 2
         self.player_size = 50
@@ -438,13 +442,23 @@ class EndlessModState:
         self.p_zone = pygame.Rect(
             self.p_zone_x, self.p_zone_y, self.p_zone_size, self.p_zone_size
         )
+        self.click_sound = pygame.mixer.Sound("GameFiles/assets/sounds/pop.mp3")
         self.enemy_size = 50
         self.enemy_speed = 2
         self.enemy_color = (255, 0, 0)
         self.enemies = []
         self.score = 0
+        self.fade_duration = 3000
+        self.total_duration = 6000
+        self.start_time = pygame.time.get_ticks()
+        self.wave_title = self.font.render(f"Wave: {self.wave}", True, (0, 0, 0))
+        self.wave_rect = self.wave_title.get_rect(
+            center=(screen_width // 2, screen_height // 2)
+        )
         self.spawn_timer = 0
+        self.wave_timer = 0
         self.spawn_interval = 200
+        self.wave_interval = 720
         self.projectiles_per_spawn = 3
 
     def spawn_enemy(self):
@@ -470,6 +484,17 @@ class EndlessModState:
             )
             self.enemies.append(enemy)
 
+    # def enemy_power_ups(self, intensity):
+    #   self.id = random.randint(1, 2)
+    #  for enemy in self.enemies:
+    #     if self.id == 1:
+    #   enemy.size += intensity * 3
+    #        enemy.hit_n += intensity
+    #  if self.id == 2:
+    #     enemy.speed += intensity /10
+    # if self.id == 3:
+    #   pass
+
     def mouse_hit_enemy(self):
         self.score += 1
 
@@ -483,10 +508,19 @@ class EndlessModState:
     def update(self):
 
         self.spawn_timer += 1
+        self.wave_timer += 1
 
         if self.spawn_timer >= self.spawn_interval:
             self.spawn_enemy()
             self.spawn_timer = 0
+
+        if self.wave_timer >= self.wave_interval:
+            self.wave += 1
+
+            self.wave_timer = 0
+
+        # if self.wave % 2 == 0:
+        # self.enemy_power_ups(5)
 
         for enemy in self.enemies:
             if self.player.collidepoint((enemy.x, enemy.y)):
@@ -498,6 +532,10 @@ class EndlessModState:
     def draw(self, surface):
         score_text = self.font.render(f"Score: {self.score}", True, (0, 0, 0))
         surface.blit(score_text, (10, 10))
+        #wave_text = self.font.render(f"Wave: {self.wave}", True, (0, 0, 0))
+        #surface.blit(wave_text, (10, 30))
+
+        surface.blit(self.wave_title, self.wave_rect)
 
         heart_x = self.screen_width - 30
         heart_y = 10
@@ -518,8 +556,11 @@ class EndlessModState:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             for enemy in self.enemies:
                 if enemy.check_for_mouse_hit():
-                    self.score += 1
-                    self.enemies.remove(enemy)
+                    enemy.hit_n -= 1
+                    if enemy.hit_n == 0:
+                        self.score += 1
+                        pygame.mixer.Sound(self.click_sound).play()
+                        self.enemies.remove(enemy)
 
 
 class FirstStageState:

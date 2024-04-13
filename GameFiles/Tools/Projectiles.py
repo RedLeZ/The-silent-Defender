@@ -1,4 +1,5 @@
 import pygame
+import random
 
 pygame.init()
 
@@ -24,6 +25,7 @@ class Projectile:
         self.color = color
         self.image = image
         self.rect = pygame.Rect(self.x, self.y, self.size, self.size)
+        self.hit_n = 1
 
     def update(self):
         dx = (self.target_x + self.size / 2) - self.x
@@ -49,3 +51,6 @@ class Projectile:
             return True
         else:
             return False
+
+    def get_pro_id(self):
+        return self.id
