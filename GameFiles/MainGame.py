@@ -484,17 +484,6 @@ class EndlessModState:
             )
             self.enemies.append(enemy)
 
-    # def enemy_power_ups(self, intensity):
-    #   self.id = random.randint(1, 2)
-    #  for enemy in self.enemies:
-    #     if self.id == 1:
-    #   enemy.size += intensity * 3
-    #        enemy.hit_n += intensity
-    #  if self.id == 2:
-    #     enemy.speed += intensity /10
-    # if self.id == 3:
-    #   pass
-
     def mouse_hit_enemy(self):
         self.score += 1
 
@@ -519,8 +508,9 @@ class EndlessModState:
 
             self.wave_timer = 0
 
-        # if self.wave % 2 == 0:
-        # self.enemy_power_ups(5)
+        if self.wave % 2 == 0:
+            for enemy in self.enemies:
+                enemy.add_power_up("speed", 3)
 
         for enemy in self.enemies:
             if self.player.collidepoint((enemy.x, enemy.y)):
@@ -532,10 +522,8 @@ class EndlessModState:
     def draw(self, surface):
         score_text = self.font.render(f"Score: {self.score}", True, (0, 0, 0))
         surface.blit(score_text, (10, 10))
-        #wave_text = self.font.render(f"Wave: {self.wave}", True, (0, 0, 0))
-        #surface.blit(wave_text, (10, 30))
-
-        surface.blit(self.wave_title, self.wave_rect)
+        wave_text = self.font.render(f"Wave: {self.wave}", True, (0, 0, 0))
+        surface.blit(wave_text, (10, 50))
 
         heart_x = self.screen_width - 30
         heart_y = 10
