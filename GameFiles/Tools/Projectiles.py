@@ -51,14 +51,4 @@ class Projectile:
             return True
         else:
             return False
-
-    def add_power_up(self, power_up, entensity):
-        self.power_up = power_up
-        self.entensity = entensity
-
-        match power_up:
-            case "speed":
-                self.speed += self.entensity
-            case "size":
-                self.size += self.entensity
-                self.hit_n += self.entensity * 2
+    

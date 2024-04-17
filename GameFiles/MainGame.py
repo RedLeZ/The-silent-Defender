@@ -510,7 +510,7 @@ class EndlessModState:
 
         if self.wave % 2 == 0:
             for enemy in self.enemies:
-                enemy.add_power_up("speed", 3)
+                enemy.add_power_up("size", 3)
 
         for enemy in self.enemies:
             if self.player.collidepoint((enemy.x, enemy.y)):
