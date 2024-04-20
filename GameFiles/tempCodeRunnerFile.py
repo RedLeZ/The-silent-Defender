@@ -449,7 +449,6 @@ class EndlessModState:
             dialogue_text,
             (255, 255, 255),
             background_color=(0, 0, 0, 180),
-            delay=1,
         )
         self.player = pygame.Rect(
             self.player_x, self.player_y, self.player_size, self.player_size
