@@ -507,11 +507,6 @@ class EndlessModState:
             self.wave += 1
 
             self.wave_timer = 0
-
-        if self.wave % 2 == 0:
-            for enemy in self.enemies:
-                enemy.add_power_up("size", 3)
-
         for enemy in self.enemies:
             if self.player.collidepoint((enemy.x, enemy.y)):
                 self.enemies.remove(enemy)
@@ -527,10 +522,10 @@ class EndlessModState:
 
         heart_x = self.screen_width - 30
         heart_y = 10
+        heart_image = pygame.image.load("GameFiles/assets/images/hrt.png")
+        heart_image = pygame.transform.scale(heart_image, (20, 20))
         for i in range(self.hearts):
-            pygame.draw.rect(
-                surface, (255, 0, 0), pygame.Rect(heart_x, heart_y, 20, 20)
-            )
+            surface.blit(heart_image, (heart_x, heart_y))
             heart_x -= 30
         pygame.draw.rect(surface, pygame.Color(255, 255, 255, 120), self.p_zone)
         pygame.draw.rect(surface, (0, 255, 0), self.player)
