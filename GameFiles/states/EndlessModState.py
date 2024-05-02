@@ -19,10 +19,7 @@ class EndlessModState:
         self.p_zone_x = self.player_x - self.p_zone_size / 2
         self.p_zone_y = self.player_y - self.p_zone_size / 2
         dialogue_text = "This is a dialogue box. Click to advance text."
-        dialogue_title = "Dialogue Title"
-        self.dialogue_box = DialogueBox(
-            400, 100, screen_width / 2 - 200, screen_height - 100
-        )
+        self.dialogue_box = DialogueBox(400, 100, 300, 300)
         self.dialogue_box.set_text(dialogue_text)
         self.dialogue_box.set_font(self.font)
         self.dialogue_box.set_color((255, 0, 0))
@@ -37,7 +34,7 @@ class EndlessModState:
         )
         self.click_sound = pygame.mixer.Sound("GameFiles/assets/sounds/pop.mp3")
         self.enemy_size = 50
-        self.enemy_speed = 14
+        self.enemy_speed = 100
         self.enemy_color = (255, 0, 0)
         self.enemies = []
         self.score = 0
