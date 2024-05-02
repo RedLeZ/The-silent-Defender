@@ -27,13 +27,13 @@ class Projectile:
         self.rect = pygame.Rect(self.x, self.y, self.size, self.size)
         self.hit_n = 1
 
-    def update(self):
+    def update(self, dt):
         dx = (self.target_x + self.size / 2) - self.x
         dy = (self.target_y + self.size / 2) - self.y
         distance = (dx**2 + dy**2) ** 0.5
         if distance != 0:
-            self.x += (dx / distance) * self.speed
-            self.y += (dy / distance) * self.speed
+            self.x += (dx / distance) * self.speed * dt
+            self.y += (dy / distance) * self.speed * dt
             self.rect.center = (self.x, self.y)
 
     def draw(self, surface):
