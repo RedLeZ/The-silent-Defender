@@ -120,7 +120,18 @@ class EndlessModState:
             surface.blit(heart_image, (heart_x, heart_y))
             heart_x -= 30
         pygame.draw.rect(surface, pygame.Color(255, 255, 255, 120), self.p_zone)
-        pygame.draw.rect(surface, (0, 255, 0), self.player)
+        if self.hearts == 3:
+            player_image = pygame.image.load("GameFiles/assets/images/Player_happy.png")
+        elif self.hearts == 2:
+            player_image = pygame.image.load(
+                "GameFiles/assets/images/Player_neutral.png"
+            )
+        else:
+            player_image = pygame.image.load("GameFiles/assets/images/Player_sad.png")
+        player_image = pygame.transform.scale(
+            player_image, (self.player_size, self.player_size)
+        )
+        surface.blit(player_image, (self.player_x, self.player_y))
 
         for enemy in self.enemies:
             enemy.draw(surface)
