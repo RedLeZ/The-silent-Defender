@@ -12,6 +12,7 @@ class EndlessModState:
         self.font = font
         self.hearts = 3
         self.wave = 1
+        self.paused = False
         self.player_x = screen_width / 2
         self.player_y = screen_height / 2
         self.player_size = 50
@@ -19,12 +20,8 @@ class EndlessModState:
         self.p_zone_x = self.player_x - self.p_zone_size / 2
         self.p_zone_y = self.player_y - self.p_zone_size / 2
         dialogue_text = "This is a dialogue box. Click to advance text."
-        self.dialogue_box = DialogueBox(400, 100, 300, 300)
+        self.dialogue_box = DialogueBox(50, 600, 24, 10)
         self.dialogue_box.set_text(dialogue_text)
-        self.dialogue_box.set_font(self.font)
-        self.dialogue_box.set_color((255, 0, 0))
-        self.dialogue_box.set_animation_speed(5)
-        self.dialogue_box.start_animation()
         self.player = pygame.Rect(
             self.player_x, self.player_y, self.player_size, self.player_size
         )
@@ -85,28 +82,30 @@ class EndlessModState:
             self.score = 0
 
     def update(self, dt):
-        self.dialogue_box.update()
+        if self.paused == False:
 
-        self.spawn_timer += dt
-        self.wave_timer += dt
+            self.dialogue_box.update()
 
-        if self.spawn_timer >= self.spawn_interval:
-            self.spawn_enemy()
-            self.spawn_timer = 0
+            self.spawn_timer += dt
+            self.wave_timer += dt
 
-        if self.wave_timer >= self.wave_interval:
-            self.wave += 1
-            self.wave_timer = 0
+            if self.spawn_timer >= self.spawn_interval:
+                self.spawn_enemy()
+                self.spawn_timer = 0
 
-        for enemy in self.enemies:
-            if self.player.collidepoint((enemy.x, enemy.y)):
-                self.enemies.remove(enemy)
-                self.on_player_hit()
+            if self.wave_timer >= self.wave_interval:
+                self.wave += 1
+                self.wave_timer = 0
 
-            enemy.update(dt)
+            for enemy in self.enemies:
+                if self.player.collidepoint((enemy.x, enemy.y)):
+                    self.enemies.remove(enemy)
+                    self.on_player_hit()
+
+                enemy.update(dt)
 
     def draw(self, surface):
-        self.dialogue_box.draw(surface)
+
         score_text = self.font.render(f"Score: {self.score}", True, (0, 0, 0))
         surface.blit(score_text, (10, 10))
         wave_text = self.font.render(f"Wave: {self.wave}", True, (0, 0, 0))
@@ -131,19 +130,45 @@ class EndlessModState:
         player_image = pygame.transform.scale(
             player_image, (self.player_size, self.player_size)
         )
+        self.dialogue_box.draw(surface)
         surface.blit(player_image, (self.player_x, self.player_y))
 
         for enemy in self.enemies:
             enemy.draw(surface)
 
+        if self.paused == True:
+            pygame.draw.rect(
+                surface,
+                (0, 0, 0),
+                pygame.Rect(
+                    surface.get_width() // 2 - 50,
+                    surface.get_height() // 2 - 25,
+                    100,
+                    50,
+                ),
+            )
+            pause_font = pygame.font.Font(None, 24)
+            pause_text = pause_font.render("Paused", True, (255, 255, 255))
+            surface.blit(
+                pause_text,
+                (
+                    surface.get_width() // 2 - pause_text.get_width() // 2,
+                    surface.get_height() // 2 - pause_text.get_height() // 2,
+                ),
+            )
+
     def handle_events(self, event):
         if event.type == pygame.QUIT:
             pygame.quit()
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            for enemy in self.enemies:
-                if enemy.check_for_mouse_hit():
-                    enemy.hit_n -= 1
-                    if enemy.hit_n == 0:
-                        self.score += 1
-                        pygame.mixer.Sound(self.click_sound).play()
-                        self.enemies.remove(enemy)
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                self.paused = not self.paused
+        if self.paused == False:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for enemy in self.enemies:
+                    if enemy.check_for_mouse_hit():
+                        enemy.hit_n -= 1
+                        if enemy.hit_n == 0:
+                            self.score += 1
+                            pygame.mixer.Sound(self.click_sound).play()
+                            self.enemies.remove(enemy)

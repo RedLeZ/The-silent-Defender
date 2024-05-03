@@ -97,7 +97,6 @@ def main():
 
         WIN.fill((255, 255, 255))
         game_state_manager.draw(WIN)
-        # Draw image_cursor to the mouse position
         mouse_pos = pygame.mouse.get_pos()
         image_cursor = Image("GameFiles/assets/images/Jeff.png", mouse_pos[0], mouse_pos[1])
         image_cursor.draw(WIN)
