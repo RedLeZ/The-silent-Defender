@@ -19,9 +19,12 @@ class EndlessModState:
         self.p_zone_size = 325
         self.p_zone_x = self.player_x - self.p_zone_size / 2
         self.p_zone_y = self.player_y - self.p_zone_size / 2
-        dialogue_text = "This is a dialogue box. Click to advance text."
-        self.dialogue_box = DialogueBox(50, 600, 24, 10)
-        self.dialogue_box.set_text(dialogue_text)
+        self.dialogue_box = DialogueBox(self.screen_width, self.screen_height)
+        self.dialogue_box.add_dialogue(
+            "Welcome to the Endless Mod...",
+            "GameFiles/assets/images/narrator.png",
+            "Narrator",
+        )
         self.player = pygame.Rect(
             self.player_x, self.player_y, self.player_size, self.player_size
         )
@@ -80,11 +83,10 @@ class EndlessModState:
             self.game_state_manager.change_state("MainMenu")
             self.hearts = 3
             self.score = 0
+            self.enemies = []
 
     def update(self, dt):
         if self.paused == False:
-
-            self.dialogue_box.update()
 
             self.spawn_timer += dt
             self.wave_timer += dt
@@ -130,7 +132,6 @@ class EndlessModState:
         player_image = pygame.transform.scale(
             player_image, (self.player_size, self.player_size)
         )
-        self.dialogue_box.draw(surface)
         surface.blit(player_image, (self.player_x, self.player_y))
 
         for enemy in self.enemies:
@@ -149,6 +150,8 @@ class EndlessModState:
             )
             pause_font = pygame.font.Font(None, 24)
             pause_text = pause_font.render("Paused", True, (255, 255, 255))
+
+            self.dialogue_box.render_text(surface)
             surface.blit(
                 pause_text,
                 (

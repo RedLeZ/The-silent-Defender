@@ -1,54 +1,48 @@
 import pygame
-import textwrap
+
 
 class DialogueBox:
-    def __init__(self, x, y, font_size=24, padding=10):
-        self.x = x
-        self.y = y
-        self.font_size = font_size
-        self.padding = padding
-        self.dialogue_font = pygame.font.Font(None, self.font_size)
-        self.dialogue_color = (0, 0, 0)
-        self.current_text = ""
-        self.text_index = 0
-        self.typing_sound = pygame.mixer.Sound("GameFiles/assets/sounds/typing.wav")
+    def __init__(self, screen_width, screen_height):
+        self.x = 400
+        self.y = 500
+        self.text = ""
+        self.dialogue_index = 0
+        self.dialogues = []
         self.background_image = pygame.image.load(
             "GameFiles/assets/images/dialogue_box.png"
         )
+        self.character_image = None
+        self.title = ""
+        self.font = pygame.font.Font(None, 24)  # Create a font object
+        self.typing_sound = pygame.mixer.Sound("GameFiles/assets/sounds/typing.wav")
 
-    def set_text(self, text):
-        self.dialogue_text = text
-        self.current_text = ""
-        self.text_index = 0
+    def add_dialogue(self, dialogue, character_image_path, title):
+        self.dialogues.append(dialogue)
+        self.character_image = pygame.image.load(character_image_path)
+        self.title = title
 
-    def update(self):
-        if self.text_index < len(self.dialogue_text):
-            self.current_text += self.dialogue_text[self.text_index]
-            self.text_index += 1
-            self.typing_sound.play()
-            words = textwrap.wrap(
-                self.current_text, self.background_image.get_width() // self.dialogue_font.size(" ")[0]
-            )
-            self.dialogue_lines = [
-                self.dialogue_font.render(line, True, self.dialogue_color)
-                for line in words
-            ]
-            self.height = (
-                len(self.dialogue_lines) * self.dialogue_font.get_height()
-                + 2 * self.padding
-            )
-            self.width = self.background_image.get_width()
+    def render_text(self, screen):
+        print("DEBUG : strating the dialogue renderer")
+        if self.dialogue_index < len(self.dialogues):
+            
+            self.text = self.dialogues[self.dialogue_index]
+            text_surface = self.font.render(
+                self.text, True, (255, 255, 255)
+            )  # Render the text
+            screen.blit(self.background_image, (self.x, self.y))
+            screen.blit(text_surface, (self.x + 10, self.y + 10))  # Draw the text
+            if self.character_image:
+                screen.blit(self.character_image, (self.x + 10, self.y + 50))
+            else:
+                self.text = ""
+                self.character_image = None
+                self.title = ""
+                screen.blit(self.background_image, (self.x, self.y))
 
-    def draw(self, screen):
-        self.background_image = pygame.transform.scale(
-            self.background_image, (self.width, self.height)
-        )
-        screen.blit(self.background_image, (self.x, self.y))
-        for i, line in enumerate(self.dialogue_lines):
-            screen.blit(
-                line,
-                (
-                    self.x + self.padding,
-                    self.y + self.padding + i * self.dialogue_font.get_height(),
-                ),
-            )
+    def play_sound_effect(self):
+        self.typing_sound.play()
+
+    def next_dialogue(self):
+        if self.dialogue_index < len(self.dialogues) - 1:
+            self.dialogue_index += 1
+            self.play_sound_effect()
