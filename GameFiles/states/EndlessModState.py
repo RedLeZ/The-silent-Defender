@@ -1,14 +1,24 @@
 import pygame
 import random
+import json
+import os
 from Tools.Projectiles import Projectile
 from Tools.DialogueBox import DialogueBox
+from Tools.Particles import ParticlePool
 
 
 class EndlessModState:
-    def __init__(self, screen_width, screen_height, font, gsm):
+    def __init__(
+        self,
+        screen_width,
+        screen_height,
+        font,
+        gsm,
+    ):
         self.screen_width = screen_width
         self.game_state_manager = gsm
         self.screen_height = screen_height
+        self.particle_system = ParticlePool(30)
         self.font = font
         self.hearts = 3
         self.wave = 1
@@ -22,6 +32,16 @@ class EndlessModState:
         self.dialogue_box = DialogueBox(self.screen_width, self.screen_height)
         self.dialogue_box.add_dialogue(
             "Welcome to the Endless Mod...",
+            "GameFiles/assets/images/narrator.png",
+            "Narrator",
+        )
+        self.dialogue_box.add_dialogue(
+            "Try Helping That boy to survive for a bit....",
+            "GameFiles/assets/images/narrator.png",
+            "Narrator",
+        )
+        self.dialogue_box.add_dialogue(
+            "Good Luck...",
             "GameFiles/assets/images/narrator.png",
             "Narrator",
         )
@@ -77,13 +97,41 @@ class EndlessModState:
     def mouse_hit_enemy(self):
         self.score += 1
 
+    def update_playerStates(self):
+        try:
+            # Check if file is empty or doesn't exist
+            if (
+                not os.path.exists("GameFiles/assets/data/private/playerstats.json")
+                or os.path.getsize("GameFiles/assets/data/private/playerstats.json")
+                == 0
+            ):
+                data = {"coins": 0, "lastScore": 0, "maxScore": 0}  # Default value
+            else:
+                # Read player stats
+                with open(
+                    "GameFiles/assets/data/private/playerstats.json", "r"
+                ) as file:
+                    data = json.load(file)
+
+            # Update player stats
+            data["coins"] += int(self.score / 3)
+            data["lastScore"] = self.score
+            data["maxScore"] = max(self.score, data["maxScore"])
+
+            # Write updated stats back to file
+            with open("GameFiles/assets/data/private/playerstats.json", "w") as file:
+                json.dump(data, file)
+        except Exception as e:
+            print(f"Error updating player stats: {e}")
+
     def on_player_hit(self):
         self.hearts -= 1
         if self.hearts <= 0:
-            self.game_state_manager.change_state("MainMenu")
+            self.update_playerStates()
             self.hearts = 3
             self.score = 0
             self.enemies = []
+            self.game_state_manager.change_state("GameOver")
 
     def update(self, dt):
         if self.paused == False:
@@ -112,6 +160,7 @@ class EndlessModState:
         surface.blit(score_text, (10, 10))
         wave_text = self.font.render(f"Wave: {self.wave}", True, (0, 0, 0))
         surface.blit(wave_text, (10, 50))
+        # added mdule
 
         heart_x = self.screen_width - 30
         heart_y = 10
@@ -136,6 +185,8 @@ class EndlessModState:
 
         for enemy in self.enemies:
             enemy.draw(surface)
+        self.dialogue_box.render_text(surface)
+        self.particle_system.update(surface)
 
         if self.paused == True:
             pygame.draw.rect(
@@ -151,7 +202,6 @@ class EndlessModState:
             pause_font = pygame.font.Font(None, 24)
             pause_text = pause_font.render("Paused", True, (255, 255, 255))
 
-            self.dialogue_box.render_text(surface)
             surface.blit(
                 pause_text,
                 (
@@ -161,11 +211,17 @@ class EndlessModState:
             )
 
     def handle_events(self, event):
+        self.dialogue_box.update()
         if event.type == pygame.QUIT:
             pygame.quit()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 self.paused = not self.paused
+        if (
+            self.dialogue_box.check_for_mouse_hit()
+            and event.type == pygame.MOUSEBUTTONUP
+        ):
+            self.dialogue_box.next_dialogue()
         if self.paused == False:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 for enemy in self.enemies:
@@ -174,4 +230,7 @@ class EndlessModState:
                         if enemy.hit_n == 0:
                             self.score += 1
                             pygame.mixer.Sound(self.click_sound).play()
+                            for _ in range(random.randint(10, 30)):
+                                self.particle_system.add_particle(enemy.x, enemy.y)
+
                             self.enemies.remove(enemy)

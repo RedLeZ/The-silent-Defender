@@ -4,12 +4,15 @@ import pygame
 from Tools.Image import Image
 from Tools.GameStateManager import GameStateManager
 
+
 # Importing States
 from states.MainMenuState import MainMenuState
 from states.SettingsState import SettingsState
 from states.CreditsState import CreditsState
 from states.LevelState import LevelState
 from states.EndlessModState import EndlessModState
+from states.ShopState import ShopState
+from states.GameOverState import GameOverState
 
 
 class FirstStageState:
@@ -69,6 +72,27 @@ def main():
         logo,
         mainBg,
     )
+    game_over_state = GameOverState(
+        WIDTH,
+        HEIGHT,
+        FONT2,
+        Click_sound,
+        btn_frame,
+        game_state_manager,
+        logo,
+        mainBg,
+    )
+    shop_state = ShopState(
+        WIDTH,
+        HEIGHT,
+        FONT2,
+        Click_sound,
+        btn_frame,
+        game_state_manager,
+        logo,
+        mainBg,
+    )
+
     endlessmod_state = EndlessModState(
         WIDTH,
         HEIGHT,
@@ -79,10 +103,11 @@ def main():
     game_state_manager.add_state("MainMenu", main_menu_state)
     game_state_manager.add_state("Settings", settings_state)
     game_state_manager.add_state("Credits", credits_state)
+    game_state_manager.add_state("Shop", shop_state)
+    game_state_manager.add_state("GameOver", game_over_state)
     game_state_manager.add_state("Levels", level_state)
     game_state_manager.add_state("Endless", endlessmod_state)
     game_state_manager.change_state("MainMenu")
-
 
     clock = pygame.time.Clock()
 
@@ -98,15 +123,12 @@ def main():
         WIN.fill((255, 255, 255))
         game_state_manager.draw(WIN)
         mouse_pos = pygame.mouse.get_pos()
-        image_cursor = Image("GameFiles/assets/images/Jeff.png", mouse_pos[0], mouse_pos[1])
+        image_cursor = Image(
+            "GameFiles/assets/images/Jeff.png", mouse_pos[0], mouse_pos[1]
+        )
         image_cursor.draw(WIN)
-
         pygame.mouse.set_visible(False)
 
         pygame.display.update()
 
     pygame.quit()
-
-
-if __name__ == "__main__":
-    main()
