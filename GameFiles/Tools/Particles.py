@@ -19,7 +19,7 @@ class Particle:
     def draw(self, window):
         color = (255, 0, 0)
         position = (int(self.x), int(self.y))
-        pygame.draw.circle(window, color, position, 2)
+        pygame.draw.circle(window, color, position, 4)
 
 
 class ParticleSystem:

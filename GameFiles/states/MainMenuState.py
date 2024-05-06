@@ -99,7 +99,11 @@ class MainMenuState:
             for button in self.buttons:
                 if button.rect.collidepoint(event.pos):
                     button.click()
-
+    def start(self):
+        pass
+    def end(self):
+        pass
+    
     def update(self, dt):
         for button in self.buttons:
             button.update(pygame.mouse.get_pos())

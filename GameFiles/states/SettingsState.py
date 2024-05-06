@@ -83,6 +83,12 @@ class SettingsState:
 
         self.sound_control.handle_event(event)
 
+    def start(self):
+        pass
+
+    def end(self):
+        pass
+
     def update(self, dt):
         pygame.mixer.music.set_volume(self.current_volume)
         for button in self.buttons:

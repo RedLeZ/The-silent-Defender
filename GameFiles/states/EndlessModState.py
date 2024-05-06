@@ -97,44 +97,27 @@ class EndlessModState:
     def mouse_hit_enemy(self):
         self.score += 1
 
-    def update_playerStates(self):
-        try:
-            # Check if file is empty or doesn't exist
-            if (
-                not os.path.exists("GameFiles/assets/data/private/playerstats.json")
-                or os.path.getsize("GameFiles/assets/data/private/playerstats.json")
-                == 0
-            ):
-                data = {"coins": 0, "lastScore": 0, "maxScore": 0}  # Default value
-            else:
-                # Read player stats
-                with open(
-                    "GameFiles/assets/data/private/playerstats.json", "r"
-                ) as file:
-                    data = json.load(file)
-
-            # Update player stats
-            data["coins"] += int(self.score / 3)
-            data["lastScore"] = self.score
-            data["maxScore"] = max(self.score, data["maxScore"])
-
-            # Write updated stats back to file
-            with open("GameFiles/assets/data/private/playerstats.json", "w") as file:
-                json.dump(data, file)
-        except Exception as e:
-            print(f"Error updating player stats: {e}")
-
     def on_player_hit(self):
         self.hearts -= 1
-        if self.hearts <= 0:
-            self.update_playerStates()
-            self.hearts = 3
-            self.score = 0
-            self.enemies = []
-            self.game_state_manager.change_state("GameOver")
+        if self.hearts == 0:
+            self.end()
+
+    def start(self):
+        self.start_time = pygame.time.get_ticks()
+        self.elapsed_time = 0
+        self.hearts = 3
+        self.score = 0
+        self.enemies = []
+        print("Start method called, start_time set to", self.start_time)
+
+    def end(self):
+        self.update_playerStates()
+        self.game_state_manager.change_state("GameOver")
 
     def update(self, dt):
         if self.paused == False:
+            self.elapsed_time = (pygame.time.get_ticks() - self.start_time) / 1000
+            print("Update method called, elapsed_time set to", self.elapsed_time)
 
             self.spawn_timer += dt
             self.wave_timer += dt
@@ -155,12 +138,19 @@ class EndlessModState:
                 enemy.update(dt)
 
     def draw(self, surface):
+        self.total_seconds = int(self.elapsed_time)
+        self.hours = self.total_seconds // 3600
+        self.minutes = (self.total_seconds % 3600) // 60
+        self.seconds = self.total_seconds % 60
+        self.milliseconds = int((self.elapsed_time - self.total_seconds) * 1000)
 
         score_text = self.font.render(f"Score: {self.score}", True, (0, 0, 0))
         surface.blit(score_text, (10, 10))
         wave_text = self.font.render(f"Wave: {self.wave}", True, (0, 0, 0))
         surface.blit(wave_text, (10, 50))
-        # added mdule
+        time_str = f"{self.hours:02}:{self.minutes:02}:{self.seconds:02}.{self.milliseconds:03}"
+        timer_text = self.font.render(time_str, True, (0, 0, 0))
+        surface.blit(timer_text, ((self.screen_width / 2) - 30, 10))
 
         heart_x = self.screen_width - 30
         heart_y = 10
@@ -234,3 +224,39 @@ class EndlessModState:
                                 self.particle_system.add_particle(enemy.x, enemy.y)
 
                             self.enemies.remove(enemy)
+
+    def update_playerStates(self):
+        print("update_playerStates called, elapsed_time is", self.elapsed_time)
+        try:
+            # Check if file is empty or doesn't exist
+            if (
+                not os.path.exists("GameFiles/assets/data/private/playerstats.json")
+                or os.path.getsize("GameFiles/assets/data/private/playerstats.json")
+                == 0
+            ):
+                data = {
+                    "coins": 0,
+                    "lastScore": 0,
+                    "maxScore": 0,
+                    "LastTimeSurvived": 0,
+                    "MaxTimeSurvived": 0,
+                }
+            else:
+                # Read player stats
+                with open(
+                    "GameFiles/assets/data/private/playerstats.json", "r"
+                ) as file:
+                    data = json.load(file)
+
+            # Update player stats
+            data["coins"] += int(self.score / 3)
+            data["lastScore"] = self.score
+            data["LastTimeSurvived"] = self.elapsed_time
+            data["maxScore"] = max(self.score, data["maxScore"])
+            data["MaxTimeSurvived"] = max(self.elapsed_time, data["MaxTimeSurvived"])
+
+            # Write updated stats back to file
+            with open("GameFiles/assets/data/private/playerstats.json", "w") as file:
+                json.dump(data, file)
+        except Exception as e:
+            print(f"Error updating player stats: {e}")
