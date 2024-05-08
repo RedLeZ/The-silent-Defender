@@ -56,6 +56,10 @@ class EndlessModState:
         self.enemy_size = 50
         self.enemy_speed = 150
         self.enemy_color = (255, 0, 0)
+        with open("GameFiles/assets/data/publicData.json") as f:
+            self.public_data = json.load(f)
+        self.background_image = self.public_data[0]["Background_Image"]
+        self.projectile_image = self.public_data[0]["Projectile_Image"]
         self.enemies = []
         self.score = 0
         self.start_time = pygame.time.get_ticks()
@@ -88,7 +92,7 @@ class EndlessModState:
                 self.enemy_speed,
                 self.enemy_size,
                 self.enemy_color,
-                None,
+                self.projectile_image,
             )
             self.enemies.append(enemy)
 
@@ -155,10 +159,11 @@ class EndlessModState:
         heart_y = 10
         heart_image = pygame.image.load("GameFiles/assets/images/hrt.png")
         heart_image = pygame.transform.scale(heart_image, (20, 20))
-        for i in range(self.hearts):
+        for _ in range(self.hearts):
             surface.blit(heart_image, (heart_x, heart_y))
             heart_x -= 30
-        pygame.draw.rect(surface, pygame.Color(255, 255, 255, 120), self.p_zone)
+        pygame.draw.rect(surface, pygame.Color(255, 255, 255, 0), self.p_zone)
+
         if self.hearts == 3:
             player_image = pygame.image.load("GameFiles/assets/images/Player_happy.png")
         elif self.hearts == 2:

@@ -1,0 +1,16 @@
+[
+    {
+        "name": "Stary Night",
+        "price": 100,
+        "image": "GameFiles/assets/images/narrator.png",
+        "item_is_bought": true,
+        "image_type": 0
+    },
+    {
+        "name": "Bullet",
+        "price": 50,
+        "image": "GameFiles/assets/images/hrt.png",
+        "item_is_bought": true,
+        "image_type": 1
+    }
+]

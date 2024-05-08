@@ -24,7 +24,7 @@ def main():
     pygame.init()
     WIDTH = 1200
     HEIGHT = 700
-    WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+    WIN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF)
     pygame.display.set_caption("The Silent Defender")
 
     FONT = pygame.font.Font("GameFiles/assets/fonts/font.otf", 40)
@@ -117,19 +117,21 @@ def main():
 
         for event in pygame.event.get():
             game_state_manager.handle_events(event)
+            if event.type == pygame.QUIT:
+                running = False
 
+        pygame.mouse.set_visible(False)
         game_state_manager.update(dt)
 
-        WIN.fill((255, 255, 255))
+        WIN.fill((0, 0, 0))
         game_state_manager.draw(WIN)
         mouse_pos = pygame.mouse.get_pos()
         image_cursor = Image(
             "GameFiles/assets/images/Jeff.png", mouse_pos[0], mouse_pos[1]
         )
         image_cursor.draw(WIN)
-        pygame.mouse.set_visible(False)
+
         pygame.display.flip()
-        pygame.display.update()
 
         clock.tick(60)
 

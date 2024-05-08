@@ -23,7 +23,12 @@ class Projectile:
         self.speed = speed
         self.size = size
         self.color = color
-        self.image = image
+        self.image = pygame.image.load(image).convert_alpha() if image else None
+        self.image = (
+            pygame.transform.scale(self.image, (self.size, self.size))
+            if self.image
+            else None
+        )
         self.rect = pygame.Rect(self.x, self.y, self.size, self.size)
         self.hit_n = 1
 
@@ -51,4 +56,3 @@ class Projectile:
             return True
         else:
             return False
-    
