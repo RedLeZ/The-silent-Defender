@@ -113,12 +113,12 @@ def main():
 
     running = True
     while running:
-        dt = clock.tick(60) / 1000  # Amount of seconds since last frame
+        dt = clock.tick(60) / 1000
 
         for event in pygame.event.get():
             game_state_manager.handle_events(event)
 
-        game_state_manager.update(dt)  # Pass delta time to your update function
+        game_state_manager.update(dt)
 
         WIN.fill((255, 255, 255))
         game_state_manager.draw(WIN)
@@ -128,8 +128,10 @@ def main():
         )
         image_cursor.draw(WIN)
         pygame.mouse.set_visible(False)
-
+        pygame.display.flip()
         pygame.display.update()
+
+        clock.tick(60)
 
     pygame.quit()
 

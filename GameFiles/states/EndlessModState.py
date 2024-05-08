@@ -18,11 +18,11 @@ class EndlessModState:
         self.screen_width = screen_width
         self.game_state_manager = gsm
         self.screen_height = screen_height
-        self.particle_system = ParticlePool(30)
         self.font = font
         self.hearts = 3
         self.wave = 1
         self.paused = False
+        self.particle_system = ParticlePool(30)
         self.player_x = screen_width / 2
         self.player_y = screen_height / 2
         self.player_size = 50
@@ -54,12 +54,10 @@ class EndlessModState:
         )
         self.click_sound = pygame.mixer.Sound("GameFiles/assets/sounds/pop.mp3")
         self.enemy_size = 50
-        self.enemy_speed = 100
+        self.enemy_speed = 150
         self.enemy_color = (255, 0, 0)
         self.enemies = []
         self.score = 0
-        self.fade_duration = 3000
-        self.total_duration = 6000
         self.start_time = pygame.time.get_ticks()
         self.wave_title = self.font.render(f"Wave: {self.wave}", True, (0, 0, 0))
         self.wave_rect = self.wave_title.get_rect(
@@ -67,8 +65,8 @@ class EndlessModState:
         )
         self.spawn_timer = 0
         self.wave_timer = 0
-        self.spawn_interval = 5
-        self.wave_interval = 60
+        self.spawn_interval = 3
+        self.wave_interval = 30
         self.projectiles_per_spawn = 3
 
     def spawn_enemy(self):
@@ -108,7 +106,7 @@ class EndlessModState:
         self.hearts = 3
         self.score = 0
         self.enemies = []
-        print("Start method called, start_time set to", self.start_time)
+        self.spawn_enemy()
 
     def end(self):
         self.update_playerStates()
@@ -117,7 +115,6 @@ class EndlessModState:
     def update(self, dt):
         if self.paused == False:
             self.elapsed_time = (pygame.time.get_ticks() - self.start_time) / 1000
-            print("Update method called, elapsed_time set to", self.elapsed_time)
 
             self.spawn_timer += dt
             self.wave_timer += dt
@@ -128,6 +125,8 @@ class EndlessModState:
 
             if self.wave_timer >= self.wave_interval:
                 self.wave += 1
+                self.enemy_speed += 50
+                self.enemy_size -= 0.2
                 self.wave_timer = 0
 
             for enemy in self.enemies:
