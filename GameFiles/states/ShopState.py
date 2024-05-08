@@ -25,6 +25,9 @@ class ShopState:
         self.background_image = background_image
         self.selected_item_index = 0
         self.showingConfirmPurchaseMenu = False
+        with open("GameFiles/assets/data/private/playerstats.json") as f:
+            self.playerState = json.load(f)
+        self.coins = self.playerState["coins"]
 
         self.buttons = [
             Button(
@@ -44,7 +47,7 @@ class ShopState:
         self.cButtons = [
             Button(
                 (self.screen_width - 100) / 2 - 100,
-                self.screen_height / 2,
+                self.screen_height / 2 - 50,
                 150,
                 50,
                 "Yes",
@@ -57,7 +60,7 @@ class ShopState:
             ),
             Button(
                 (self.screen_width - 100) / 2 + 100,
-                self.screen_height / 2,
+                self.screen_height / 2 - 50,
                 150,
                 50,
                 "No",
@@ -88,7 +91,7 @@ class ShopState:
         item_name = item["name"]
         item_price = item["price"]
         item_image = item["image"]
-        if self.coins >= item_price:
+        if self.coins >= item_price and item["item_is_bought"] == False:
             self.coins -= item_price
             self.playerState["coins"] = self.coins
             item["item_is_bought"] = True
@@ -181,11 +184,17 @@ class ShopState:
         item_name = item["name"]
         item_price = item["price"]
         text = f"Are you sure you want to buy {item_name} for {item_price} coins?"
-        print(text)
         return text
 
     def DrawConfirmPurchaseMenu(self, screen, text):
         font = pygame.font.Font(None, 36)
+        backgroundRect = pygame.Rect(
+            self.screen_width / 4 - 10,
+            self.screen_height / 3,
+            self.screen_width / 2 + 50,
+            self.screen_height / 5,
+        )
+        pygame.draw.rect(screen, (255, 0, 255), backgroundRect)
         text = font.render(text, True, (0, 0, 0))
         screen.blit(text, (self.screen_width / 4, self.screen_height / 3))
         for cButtons in self.cButtons:
@@ -197,6 +206,10 @@ class ShopState:
         for button in self.buttons:
             button.draw(screen)
         self.draw_item_list(screen)
+        # draw the coins
+        font = pygame.font.Font(None, 36)
+        text = font.render(f"Coins: {self.coins}", True, (0, 0, 0))
+        screen.blit(text, (self.screen_width - 150, 20))
         if self.showingConfirmPurchaseMenu:
             self.DrawConfirmPurchaseMenu(
                 screen, self.confirmPurchase_menu(self.selected_item_index)
