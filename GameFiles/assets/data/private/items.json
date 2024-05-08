@@ -1,16 +1,1 @@
-[
-    {
-        "name": "Stary Night",
-        "price": 100,
-        "image": "GameFiles/assets/images/narrator.png",
-        "item_is_bought": true,
-        "image_type": 0
-    },
-    {
-        "name": "Bullet",
-        "price": 50,
-        "image": "GameFiles/assets/images/hrt.png",
-        "item_is_bought": true,
-        "image_type": 1
-    }
-]
+[{"name": "violet", "price": 7600, "image": "GameFiles/assets/images/shopImages/Backgrounds/violet.png", "item_is_bought": false, "image_type": 0}, {"name": "in Space", "price": 10000, "image": "GameFiles/assets/images/shopImages/Backgrounds/in_space.png", "item_is_bought": false, "image_type": 0}, {"name": "Cold Night", "price": 5000, "image": "GameFiles/assets/images/shopImages/Backgrounds/cold_night.png", "item_is_bought": true, "image_type": 0}, {"name": "Bullet", "price": 1200, "image": "GameFiles/assets/images/hrt.png", "item_is_bought": true, "image_type": 1}]

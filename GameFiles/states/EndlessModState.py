@@ -60,6 +60,9 @@ class EndlessModState:
             self.public_data = json.load(f)
         self.background_image = self.public_data[0]["Background_Image"]
         self.projectile_image = self.public_data[0]["Projectile_Image"]
+        self.background_image = pygame.transform.scale(
+            pygame.image.load(self.background_image), (screen_width, screen_height)
+        )
         self.enemies = []
         self.score = 0
         self.start_time = pygame.time.get_ticks()
@@ -141,18 +144,20 @@ class EndlessModState:
                 enemy.update(dt)
 
     def draw(self, surface):
+        pygame.draw.rect(surface, pygame.Color(255, 255, 255, 0), self.p_zone)
+        surface.blit(self.background_image, (0, 0))
         self.total_seconds = int(self.elapsed_time)
         self.hours = self.total_seconds // 3600
         self.minutes = (self.total_seconds % 3600) // 60
         self.seconds = self.total_seconds % 60
         self.milliseconds = int((self.elapsed_time - self.total_seconds) * 1000)
 
-        score_text = self.font.render(f"Score: {self.score}", True, (0, 0, 0))
+        score_text = self.font.render(f"Score: {self.score}", True, (255, 0, 0))
         surface.blit(score_text, (10, 10))
-        wave_text = self.font.render(f"Wave: {self.wave}", True, (0, 0, 0))
+        wave_text = self.font.render(f"Wave: {self.wave}", True, (255, 0, 0))
         surface.blit(wave_text, (10, 50))
         time_str = f"{self.hours:02}:{self.minutes:02}:{self.seconds:02}.{self.milliseconds:03}"
-        timer_text = self.font.render(time_str, True, (0, 0, 0))
+        timer_text = self.font.render(time_str, True, (100, 200, 0))
         surface.blit(timer_text, ((self.screen_width / 2) - 30, 10))
 
         heart_x = self.screen_width - 30
@@ -162,7 +167,6 @@ class EndlessModState:
         for _ in range(self.hearts):
             surface.blit(heart_image, (heart_x, heart_y))
             heart_x -= 30
-        pygame.draw.rect(surface, pygame.Color(255, 255, 255, 0), self.p_zone)
 
         if self.hearts == 3:
             player_image = pygame.image.load("GameFiles/assets/images/Player_happy.png")
