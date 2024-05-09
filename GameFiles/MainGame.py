@@ -25,6 +25,8 @@ def main():
     WIDTH = 1200
     HEIGHT = 700
     WIN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF)
+    ICON = pygame.image.load("GameFiles/Jeff.jpeg").convert_alpha()
+    pygame.display.set_icon(ICON)
     pygame.display.set_caption("The Silent Defender")
 
     FONT = pygame.font.Font("GameFiles/assets/fonts/font.otf", 40)
