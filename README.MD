@@ -1,6 +1,6 @@
 # The Silent Defender
 
-The Silent Defender is a simple game developed in Python using the Pygame library. It still Under Develpment So you wont find a big thing for now.
+The Silent Defender is a simple game developed in Python using the Pygame library (first game and i am learning using it). It still Under Develpment So you wont find a big thing for now.
 
 
 
