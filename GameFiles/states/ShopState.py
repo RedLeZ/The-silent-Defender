@@ -140,15 +140,20 @@ class ShopState:
             pygame.draw.rect(screen, (255, 255, 255), item_box)
             font = pygame.font.Font(None, 36)
             text = font.render(item_name, True, (0, 0, 0))
-            screen.blit(text, (x, y + 100))
-            text = font.render(str(item_price), True, (0, 0, 0))
             screen.blit(text, (x, y + 120))
+            text = font.render(str(item_price), True, (0, 0, 0))
+            screen.blit(text, (x, y + 140))
             screen.blit(item_image, (x, y))
 
             if i == self.selected_item_index:
-                pygame.draw.rect(screen, (255, 0, 0), (x, y, 100, 100), 5)  # Red border
+                image = pygame.transform.scale(
+                    pygame.image.load("GameFiles/assets/images/btn_frame.png"),
+                    (110, 145),
+                )
+                screen.blit(image, (x - 5, y - 20))
             x += 200
             if x >= self.screen_width - 150:
+                y += 200
                 x = 50
 
     def update(self, dt):
@@ -192,11 +197,12 @@ class ShopState:
             self.screen_width / 4 - 10,
             self.screen_height / 3,
             self.screen_width / 2 + 50,
-            self.screen_height / 5,
+            self.screen_height / 5 + 30,
         )
-        pygame.draw.rect(screen, (255, 0, 255), backgroundRect)
+
+        pygame.draw.rect(screen, (123, 123, 123), backgroundRect)
         text = font.render(text, True, (0, 0, 0))
-        screen.blit(text, (self.screen_width / 4, self.screen_height / 3))
+        screen.blit(text, (self.screen_width / 4 + 10, self.screen_height / 3 + 5))
         for cButtons in self.cButtons:
             cButtons.draw(screen)
 
@@ -209,7 +215,7 @@ class ShopState:
         # draw the coins
         font = pygame.font.Font(None, 36)
         text = font.render(f"Coins: {self.coins}", True, (0, 0, 0))
-        screen.blit(text, (self.screen_width - 150, 20))
+        screen.blit(text, (self.screen_width - 200, 20))
         if self.showingConfirmPurchaseMenu:
             self.DrawConfirmPurchaseMenu(
                 screen, self.confirmPurchase_menu(self.selected_item_index)

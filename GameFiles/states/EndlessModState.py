@@ -6,6 +6,8 @@ from Tools.Projectiles import Projectile
 from Tools.DialogueBox import DialogueBox
 from Tools.Particles import ParticlePool
 
+pygame.init()
+
 
 class EndlessModState:
     def __init__(
@@ -21,11 +23,13 @@ class EndlessModState:
         self.font = font
         self.hearts = 3
         self.wave = 1
+        self.playerHurtSound = pygame.mixer.Sound("GameFiles/assets/sounds/hurt.wav")
         self.paused = False
         self.particle_system = ParticlePool(30)
-        self.player_x = screen_width / 2
-        self.player_y = screen_height / 2
-        self.player_size = 50
+        self.player_size = 75
+        self.player_x = screen_width / 2 - self.player_size / 2
+        self.player_y = screen_height / 2 - self.player_size / 2
+
         self.p_zone_size = 325
         self.p_zone_x = self.player_x - self.p_zone_size / 2
         self.p_zone_y = self.player_y - self.p_zone_size / 2
@@ -73,7 +77,7 @@ class EndlessModState:
         self.spawn_timer = 0
         self.wave_timer = 0
         self.spawn_interval = 3
-        self.wave_interval = 30
+        self.wave_interval = 20
         self.projectiles_per_spawn = 3
 
     def spawn_enemy(self):
@@ -104,12 +108,25 @@ class EndlessModState:
 
     def on_player_hit(self):
         self.hearts -= 1
+        self.playerHurtSound.play()
         if self.hearts == 0:
             self.end()
 
     def start(self):
+        with open("GameFiles/assets/data/publicData.json") as f:
+            self.public_data = json.load(f)
+        self.background_image = self.public_data[0]["Background_Image"]
+        self.projectile_image = self.public_data[0]["Projectile_Image"]
+        self.background_image = pygame.transform.scale(
+            pygame.image.load(self.background_image),
+            (self.screen_width, self.screen_height),
+        )
         self.start_time = pygame.time.get_ticks()
         self.elapsed_time = 0
+        self.wave = 1
+        self.enemy_speed = 150
+        self.enemy_size = 50
+        self.projectiles_per_spawn = 3
         self.hearts = 3
         self.score = 0
         self.enemies = []
@@ -134,6 +151,8 @@ class EndlessModState:
                 self.wave += 1
                 self.enemy_speed += 50
                 self.enemy_size -= 0.2
+                if random.uniform(0, 1) > 0.5:
+                    self.projectiles_per_spawn += 1
                 self.wave_timer = 0
 
             for enemy in self.enemies:

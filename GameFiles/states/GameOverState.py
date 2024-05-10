@@ -24,6 +24,10 @@ class GameOverState:
         self.game_state_manager = game_state_manager
         self.logo = logo
         self.background_image = background_image
+        self.gameoverfont = pygame.font.Font("GameFiles/assets/fonts/font2.otf", 70)
+        self.gameovertext = self.gameoverfont.render(
+            "You Got Him emotional Damaged ! ", True, (200, 0, 0)
+        )
 
         self.stats_file = "GameFiles/assets/data/private/playerstats.json"
         button_width = 250
@@ -98,15 +102,23 @@ class GameOverState:
 
     def draw(self, surface):
         self.background_image.draw(surface)
-        self.logo.draw(surface)
+        # self.logo.draw(surface)
         for button in self.buttons:
             button.draw(surface)
+
+        surface.blit(
+            self.gameovertext,
+            (
+                (self.screen_width / 3) - self.gameovertext.get_rect().width / 4,
+                self.screen_height / 8,
+            ),
+        )
 
         surface.blit(
             self.coin_text, ((self.screen_width / 3) - 120, self.screen_height / 4)
         )
         surface.blit(
-            self.score_text, ((self.screen_width / 3) + 120, self.screen_height / 4)
+            self.score_text, ((self.screen_width / 3) + 130, self.screen_height / 4)
         )
         surface.blit(
             self.time_text, ((self.screen_width / 3) + 240, self.screen_height / 4)
