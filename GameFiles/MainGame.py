@@ -24,7 +24,8 @@ def main():
     pygame.init()
     WIDTH = 1200
     HEIGHT = 700
-    WIN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF)
+
+    WIN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF, pygame.FULLSCREEN)
     ICON = pygame.image.load("GameFiles/Jeff.jpeg").convert_alpha()
     pygame.display.set_icon(ICON)
     pygame.display.set_caption("The Silent Defender")
